@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 현대사회와 윤리 토론방</title>
+    <!-- Google Fonts & Lucide Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 사이드바: 사용자 인증 및 설정 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="graduation-cap"></i>
+                    <span>현사윤 토론방</span>
+                </div>
+            </div>
+
+            <!-- 모드 선택 탭 -->
+            <div class="mode-tabs">
+                <button class="tab-btn active" id="tab-student" onclick="switchMode('student')">
+                    <i data-lucide="user"></i> 학생 모드
+                </button>
+                <button class="tab-btn" id="tab-teacher" onclick="switchMode('teacher')">
+                    <i data-lucide="shield-alert"></i> 교사 모드
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- 학생 로그인/접속 영역 -->
+                <div id="student-section" class="auth-card">
+                    <div id="student-login-form">
+                        <h3>학번 로그인</h3>
+                        <p class="section-desc">의견을 제출하거나 반론을 작성하기 위해 학번을 입력하세요.</p>
+                        <div class="input-group">
+                            <i data-lucide="credit-card"></i>
+                            <input type="text" id="student-id-input" placeholder="예: 30101" maxlength="10">
+                        </div>
+                        <button class="btn btn-primary" onclick="loginStudent()">
+                            토론방 입장 <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div id="student-profile" class="hidden">
+                        <div class="profile-badge">
+                            <div class="avatar">학</div>
+                            <div class="profile-info">
+                                <span class="profile-label">접속 중인 학생</span>
+                                <span class="profile-id" id="display-student-id">30101</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="logoutStudent()">
+                            <i data-lucide="log-out"></i> 로그아웃
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 교사 인증 및 관리 영역 -->
+                <div id="teacher-section" class="auth-card hidden">
+                    <div id="teacher-login-form">
+                        <h3>교사(관리자) 인증</h3>
+                        <p class="section-desc">쟁점 변경 및 관리 권한 획득을 위해 인증 코드를 입력하세요.</p>
+                        <div class="input-group">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="teacher-code-input" placeholder="인증 코드 입력">
+                        </div>
+                        <button class="btn btn-secondary" onclick="loginTeacher()">
+                            관리자 인증 <i data-lucide="unlock"></i>
+                        </button>
+                    </div>
+
+                    <div id="teacher-profile" class="hidden">
+                        <div class="profile-badge admin">
+                            <div class="avatar">교</div>
+                            <div class="profile-info">
+                                <span class="profile-label">인증 완료</span>
+                                <span class="profile-id">교사(관리자)</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="logoutTeacher()">
+                            <i data-lucide="log-out"></i> 인증 해제
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 의견 작성 폼 (학생 로그인 시 활성화) -->
+                <div id="opinion-form-container" class="opinion-form-card disabled">
+                    <div class="card-overlay" id="form-overlay">
+                        <p><i data-lucide="lock"></i> 학번 로그인 후 의견을 제출할 수 있습니다.</p>
+                    </div>
+                    <h3>📢 내 입장 제출하기</h3>
+                    <div class="form-group">
+                        <label>입장 선택</label>
+                        <div class="stance-selector">
+                            <label class="stance-option stance-pro">
+                                <input type="radio" name="stance" value="찬성" checked>
+                                <span class="stance-box">
+                                    <i data-lucide="thumbs-up"></i> 찬성
+                                </span>
+                            </label>
+                            <label class="stance-option stance-con">
+                                <input type="radio" name="stance" value="반대">
+                                <span class="stance-box">
+                                    <i data-lucide="thumbs-down"></i> 반대
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="opinion-reason">구체적인 근거 작성</label>
+                        <textarea id="opinion-reason" placeholder="그렇게 생각하는 구체적인 이유를 작성하세요..."></textarea>
+                    </div>
+                    <button class="btn btn-success w-full" onclick="submitOpinion()">
+                        <i data-lucide="send"></i> 포스트잇 등록
+                    </button>
+                </div>
+
+                <!-- 교사용 관리 콘솔 (교사 인증 시 활성화) -->
+                <div id="teacher-console" class="teacher-console-card disabled">
+                    <div class="card-overlay" id="console-overlay">
+                        <p><i data-lucide="lock"></i> 교사 인증이 필요합니다.</p>
+                    </div>
+                    <h3>📝 쟁점 관리 및 발제</h3>
+                    <div class="form-group">
+                        <label for="new-topic-input">새로운 토론 쟁점</label>
+                        <textarea id="new-topic-input" placeholder="새로운 토론 쟁점을 제시하세요..."></textarea>
+                    </div>
+                    <button class="btn btn-danger w-full" onclick="updateTopic()">
+                        <i data-lucide="refresh-cw"></i> 쟁점 업데이트 및 토론방 초기화
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 메인 토론 광장 -->
+        <main class="main-content">
+            <!-- 헤더: 토론 쟁점 표시 -->
+            <header class="debate-header">
+                <div class="badge">CURRENT TOPIC</div>
+                <h1 id="current-topic-text">인공지능(AI)에게 법적·도덕적 책임을 부여해야 하는가?</h1>
+            </header>
+
+            <!-- 찬성 / 반대 포스트잇 보드 -->
+            <div class="debate-board">
+                <!-- 찬성 의견 칼럼 -->
+                <section class="board-column column-pro">
+                    <div class="column-header">
+                        <div class="header-title">
+                            <span class="dot dot-pro"></span>
+                            <h2>🔵 찬성 의견</h2>
+                        </div>
+                        <span class="count-badge" id="pro-count">0</span>
+                    </div>
+                    <div class="postit-list" id="pro-list">
+                        <!-- 찬성 포스트잇들이 동적으로 추가됩니다 -->
+                    </div>
+                </section>
+
+                <!-- 반대 의견 칼럼 -->
+                <section class="board-column column-con">
+                    <div class="column-header">
+                        <div class="header-title">
+                            <span class="dot dot-con"></span>
+                            <h2>🔴 반대 의견</h2>
+                        </div>
+                        <span class="count-badge" id="con-count">0</span>
+                    </div>
+                    <div class="postit-list" id="con-list">
+                        <!-- 반대 포스트잇들이 동적으로 추가됩니다 -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- 토스트 알림 컨테이너 -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
